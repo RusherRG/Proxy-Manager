@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import os
 
 mongo_uri = 'mongodb://{0}:{1}'.format(
-    os.environ['mongo_user'], os.environ['mongo_pass'])
+    "os.environ['mongo_user']", "os.environ['mongo_pass']")
 
 
 def connect():

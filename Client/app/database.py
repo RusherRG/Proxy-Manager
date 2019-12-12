@@ -14,13 +14,16 @@ def connect():
     return db
 
 
-def add_request(request_json):
+def get_requests():
     """
-    Add a request to database
+    Get all requests from the database
     """
     db = connect().requests
     try:
-        db.insert(request_json)
-        return True
+        requests_list = db.find_one()
+        print(requests_list)
+        for req in requests_list:
+            del req['_Id']
+        return requests_list
     except:
-        return False
+        return []

@@ -1,15 +1,14 @@
 from pymongo import MongoClient
 import os
 
-mongo_uri = 'mongodb://{0}:{1}'.format(
-    "os.environ['mongo_user']", "os.environ['mongo_pass']")
-
+MONGODB_HOST = os.environ['MONGODB_HOST']
+MONGODB_PORT = int(os.environ['MONGODB_PORT'])
 
 def connect():
     """
     Create a connection to database
     """
-    client = MongoClient(mongo_uri)
+    client = MongoClient(MONGODB_HOST, MONGODB_PORT)
     db = client.distributed_requests
     return db
 
@@ -20,10 +19,12 @@ def get_requests():
     """
     db = connect().requests
     try:
-        requests_list = db.find_one()
-        print(requests_list)
+        requests_list = db.find()
+        response = []
         for req in requests_list:
-            del req['_Id']
-        return requests_list
-    except:
+            del req['_id']
+            response.append(req)
+        return response
+    except Exception as exc:
+        print(exc)
         return []

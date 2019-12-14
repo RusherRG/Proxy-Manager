@@ -1,14 +1,11 @@
 from flask import render_template, request, jsonify
 import random
 
-from .database import get_requests
 from app import app
-
-
+ 
 @app.route('/')
-def dashboard():
-    request_list = []
-    return render_template("dashboard.html", requests = request_list)
+def index():
+    return render_template('index.html')
 
 
 @app.route('/generate_request')

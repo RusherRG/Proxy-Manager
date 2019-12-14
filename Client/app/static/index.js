@@ -26,12 +26,12 @@ async function create_requests() {
     var i = 100;
     var request_json = null;
     while(i--){
-        $.get("http://localhost:3000/generate_request", function(data){
+        $.get("http://localhost:5000/generate_request", function(data){
             request_json = data;
             request_json['id'] = i;
         });
         send_requests(request_json);    
-        await sleep(1000);
+        await sleep(3000);
     }
 }
 

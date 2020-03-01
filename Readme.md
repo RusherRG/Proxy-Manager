@@ -11,7 +11,4 @@ A proxy server that can be hosted easily anywhere with a dashboard to monitor al
 
 ## Monitor
 
-* Fetch the logs from database
-* Display all the logs along with their statuses
-* Use a new database tool to store
-
+* Elastic Stack

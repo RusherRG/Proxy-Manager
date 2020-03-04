@@ -26,16 +26,16 @@ es = Elasticsearch(hosts="http://elastic:1234567Ee@localhost:9200/")
 
 @app.route('/', methods=['GET', 'POST'])
 def proxy():
+    print("request")
     ip = request.remote_addr
     headers = dict(request.headers)
-    data, params, response = None, None, None
+    data, params, response, url = None, None, None, None
     logger = get_logger()
     logger.debug("Received request from ip: {}".format(ip).encode())
 
     if 'Host' in headers:
         del headers['Host']
     headers['User-Agent'] = user_agent_rotator.get_random_user_agent()
-
     try:
         if request.method == 'GET':
             params = dict(request.args)
@@ -43,37 +43,44 @@ def proxy():
             logger.info("Sending GET request to url: {}".format(url))
             response = requests.get(url, headers=headers, params=params)
         elif request.method == 'POST':
-            data = request.get_json(force=True)
+            data = request.form
+            if data.get('url') is None:
+                data = request.get_json(force=True)
             url = data.get('url').strip()
             logger.info("Sending POST request to url: {}".format(url))
             response = requests.post(url, headers=headers, data=data)
     except Exception as err:
+        print(err)
         logger.error(err)
 
-    logger.info("Response received")
-    body = {
-        "ip": ip,
-        "request": {
-            "url": url,
-            "method": request.method,
-            "headers": headers,
-            "data": params if request.method == 'GET' else data
-        },
-        "response": response.text,
-        "timestamp": str(datetime.now()),
-    }
-
     try:
+        logger.info("Response received")
+        body = {
+            "ip": ip,
+            "request": {
+                "url": url,
+                "method": request.method,
+                "headers": headers,
+                "data": params if request.method == 'GET' else data
+            },
+            "response": response.text,
+            "timestamp": str(datetime.now()),
+        }
         logger.info("Logging information to ElasticSearch")
         es.index(index="requests", body=body)
         logger.info("Request completed")
     except Exception as err:
         logger.error(err)
-
-    return {
-        'response': response.text,
-        'status': response.status_code
-    }
+    if response is not None:
+        return {
+            'response': response.text,
+            'status': response.status_code
+        }
+    else:
+        return {
+            'response': "Some error occurred",
+            'status': 500
+        }
 
 
 def get_logger():
@@ -94,4 +101,4 @@ def get_logger():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0")

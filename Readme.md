@@ -12,3 +12,21 @@ A proxy server that can be hosted easily anywhere with a dashboard to monitor al
 ## Monitor
 
 * Elastic Stack
+
+```
+cd Monitor/
+docker-compose up
+```
+
+```
+cd Server/
+docker build . -t flask-proxy-server
+```
+
+```
+sudo minikube start --vm-driver=none
+kubectl apply -f Server/deployment.yaml
+kubectl autoscale deployment flask-proxy-server --cpu-percent=50 --min=1 --max=10
+```
+
+

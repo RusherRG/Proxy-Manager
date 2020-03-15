@@ -21,12 +21,11 @@ user_agent_rotator = UserAgent(
 app = Flask(__name__)
 app.config.from_object('config')
 
-es = Elasticsearch(hosts="http://elastic:1234567Ee@localhost:9200/")
+es = Elasticsearch(hosts="http://elastic:1234567Ee@34.94.244.167:9200/")
 
 
 @app.route('/', methods=['GET', 'POST'])
 def proxy():
-    print("request")
     ip = request.remote_addr
     headers = dict(request.headers)
     data, params, response, url = None, None, None, None
@@ -95,7 +94,7 @@ def get_logger():
     logger = logging.getLogger("Server")
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logstash.TCPLogstashHandler(
-        'localhost', 6000, version=1))
+        '34.94.244.167', 6000, version=1))
 
     return logger
 

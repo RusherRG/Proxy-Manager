@@ -7,7 +7,7 @@ letters = string.ascii_letters + string.digits
 
 
 def send_request():
-    url = "https://webhook.site/360d7cf8-4df7-4069-b5cf-6dc789bb6de0"
+    url = "https://webhook.site/9d71f794-c6f4-4ee6-a97a-dd66d56007d9"
     method = ['GET', 'POST'][random.randint(0, 1)]
     if method == 'GET':
         params = {

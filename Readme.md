@@ -43,6 +43,8 @@ kubectl apply -f Server/deployment.yaml
 kubectl autoscale deployment flask-proxy-server --cpu-percent=50 --min=1 --max=10
 ```
 
+`python3 proxy.py` A script for simulate high load on the server 
+
 ## Contributing
 
 Open to enhancements & bug-fixes

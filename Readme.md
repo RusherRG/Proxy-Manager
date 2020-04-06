@@ -1,4 +1,10 @@
+<div align='center'>
+  
 # Scalable Proxy Server
+
+[![forthebadge](https://forthebadge.com/images/badges/you-didnt-ask-for-this.svg)](https://forthebadge.com)
+
+</div>
 
 A proxy server that can be hosted easily anywhere with a dashboard to monitor all the requests and their statuses. The proxy server would be scalable and load balancers would be used. This was done to try building building scalable applications and learn many tools.
 

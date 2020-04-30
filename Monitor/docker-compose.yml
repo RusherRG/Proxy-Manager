@@ -40,8 +40,8 @@ services:
       - ./logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./pipeline:/usr/share/logstash/pipeline
     ports:
-      - 6000:5000/tcp
-      - 6000:5000/udp
+      - 7000:5000/tcp
+      - 7000:5000/udp
       - 9600:9600
     networks:
       - elastic

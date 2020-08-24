@@ -1,0 +1,102 @@
+import os
+import json
+import math
+import time
+from utils import get_logger
+
+logger = get_logger(__name__)
+
+
+def fetch_secrets():
+    logger.info("Fetching secrets")
+    pass
+
+
+def post_secrets(secrets_json):
+    logger.info("Posting secrets")
+    pass
+
+
+def update_secrets(file_path="configs/secrets.json"):
+    if not os.path.isfile(file_path):
+        logger.error("File not found: '{}'".format(file_path))
+        return
+
+    with open(file_path, "r") as f:
+        secrets_json = json.load(f)
+        logger.info("Restructing 'secrets.json'")
+        secrets = {
+            "key_based": {},
+            "ip_based": {},
+            "last_update": int(time.time())
+        }
+        for secret_type in ["key_based", "ip_based"]:
+            for endpoint, keys in secrets_json.get(secret_type, {}).items():
+                secrets[secret_type][endpoint] = {
+                    "limit": keys.get("limit", math.inf),
+                    "refresh_rate": keys.get("refersh_rate", math.inf)
+                }
+                if "key" in secret_type:
+                    secrets[secret_type][endpoint]["keys"] = {}
+                    for key in keys.get("keys", []):
+                        secrets[secret_type][endpoint]["keys"][key] = 0
+                else:
+                    secrets[secret_type][endpoint]["ips"] = {}
+                    for ip in secrets_json.get("ips", []):
+                        secrets[secret_type][endpoint]["ips"][ip] = 0
+
+        post_secrets(secrets)
+
+    return
+
+
+def get_secret(secret_type, endpoint):
+    secrets_json = fetch_secrets()
+    secrets = secrets_json.get(
+        secret_type+"_based", {}).get(endpoint, {}).get(secret_type+"s", {})
+    if not secrets:
+        logger.error("No {}s found for {}".format(secret_type, endpoint))
+        return None
+    logger.info("Fetch {} for {}".format(secret_type, endpoint))
+    min_usage = math.inf
+    secret = None
+    for sec, usage in secrets.items():
+        if usage < min_usage:
+            secret = sec
+            min_usage = usage
+    return secret
+
+
+def get_key(endpoint):
+    key = get_secret("key", endpoint)
+    return key
+
+
+def get_proxy(endpoint):
+    ip = get_secret("ip", endpoint)
+    return ip
+
+
+def update_count(secret, endpoint, secret_type, count):
+    secrets_json = fetch_secrets()
+    secrets_json[secret_type+"_based"][endpoint][secret_type+"s"][secret] += \
+        count
+    post_secrets(secrets_json)
+    return
+
+
+def reset_limits():
+    secrets_json = fetch_secrets
+    last_update = secrets_json.get("last_update", time.time())
+    time_difference = (time.time() - last_update) // 60
+    for secret_type in secrets_json:
+        for endpoint, keys in secrets_json.get(secret_type, {}).items():
+            if time_difference < endpoint["refresh_rate"]:
+                continue
+            logger.info("Resetting limits for {}".format(endpoint))
+            dict_key = "keys" if "key" in secret_type else "ips"
+            for key in keys:
+                secrets_json[secret_type][endpoint][dict_key][key] = 0
+    secrets_json["last_update"] = time.time()
+    post_secrets(secrets_json)
+    return

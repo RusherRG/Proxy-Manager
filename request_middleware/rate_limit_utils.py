@@ -1,20 +1,13 @@
 import os
+import sys
 import json
 import math
 import time
+
 from utils import get_logger
+from .elasticsearch_utils import fetch_secrets, post_secrets
 
 logger = get_logger(__name__)
-
-
-def fetch_secrets():
-    logger.info("Fetching secrets")
-    pass
-
-
-def post_secrets(secrets_json):
-    logger.info("Posting secrets")
-    pass
 
 
 def update_secrets(file_path="configs/secrets.json"):
@@ -33,8 +26,8 @@ def update_secrets(file_path="configs/secrets.json"):
         for secret_type in ["key_based", "ip_based"]:
             for endpoint, keys in secrets_json.get(secret_type, {}).items():
                 secrets[secret_type][endpoint] = {
-                    "limit": keys.get("limit", math.inf),
-                    "refresh_rate": keys.get("refersh_rate", math.inf)
+                    "limit": keys.get("limit", sys.maxsize),
+                    "refresh_rate": keys.get("refresh_rate", sys.maxsize)
                 }
                 if "key" in secret_type:
                     secrets[secret_type][endpoint]["keys"] = {}
@@ -54,6 +47,8 @@ def get_secret(secret_type, endpoint):
     secrets_json = fetch_secrets()
     secrets = secrets_json.get(
         secret_type+"_based", {}).get(endpoint, {}).get(secret_type+"s", {})
+    limit = secrets_json.get(secret_type+"_based", {}
+                             ).get(endpoint, {}).get("limit")
     if not secrets:
         logger.error("No {}s found for {}".format(secret_type, endpoint))
         return None
@@ -61,9 +56,11 @@ def get_secret(secret_type, endpoint):
     min_usage = math.inf
     secret = None
     for sec, usage in secrets.items():
-        if usage < min_usage:
+        if usage < min_usage and usage < limit:
             secret = sec
             min_usage = usage
+    if secret is None:
+        logger.warn("No secrets under limit")
     return secret
 
 
@@ -77,7 +74,7 @@ def get_proxy(endpoint):
     return ip
 
 
-def update_count(secret, endpoint, secret_type, count):
+def update_count(secret_type, endpoint, secret, count):
     secrets_json = fetch_secrets()
     secrets_json[secret_type+"_based"][endpoint][secret_type+"s"][secret] += \
         count

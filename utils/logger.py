@@ -1,7 +1,7 @@
 import logging
 import colorlog
 
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO
 
 
 def get_logger(name):

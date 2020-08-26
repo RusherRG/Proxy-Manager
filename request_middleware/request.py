@@ -21,6 +21,8 @@ class Request:
         self.create_session()
 
     def create_session(self):
+        """
+        """
         software_names = [SoftwareName.CHROME.value]
         operating_systems = [OperatingSystem.WINDOWS.value,
                              OperatingSystem.LINUX.value]

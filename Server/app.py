@@ -8,8 +8,6 @@ from datetime import datetime
 from elasticsearch import Elasticsearch
 
 
-
-
 app = Flask(__name__)
 app.config.from_object('config')
 

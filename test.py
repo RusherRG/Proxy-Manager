@@ -1,5 +1,10 @@
-from request_middleware.rate_limit_utils import update_secrets
+import time
+from tests.runner import setup, run
+from dotenv import load_dotenv
 
+load_dotenv()
 
 if __name__ == "__main__":
-    update_secrets()
+    setup()
+    time.sleep(4)
+    run()

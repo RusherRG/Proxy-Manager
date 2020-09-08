@@ -55,6 +55,7 @@ def get_secret(secret_type, endpoint):
     logger.info("Fetch {} for {}".format(secret_type, endpoint))
     min_usage = math.inf
     secret = None
+    print(secrets)
     for sec, usage in secrets.items():
         if usage < min_usage and usage < limit:
             secret = sec
@@ -75,6 +76,7 @@ def get_proxy(endpoint):
 
 
 def update_count(secret_type, endpoint, secret, count):
+    logger.info("Updating count {} by {}".format(endpoint, count))
     secrets_json = fetch_secrets()
     secrets_json[secret_type+"_based"][endpoint][secret_type+"s"][secret] += \
         count

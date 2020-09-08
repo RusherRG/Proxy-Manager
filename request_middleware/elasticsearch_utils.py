@@ -1,8 +1,9 @@
+from datetime import datetime
 from elasticsearch import Elasticsearch
 from utils import get_logger
 
 logger = get_logger(__name__)
-es = Elasticsearch(hosts="")
+es = Elasticsearch(hosts="http://elastic:1234567Ee@localhost:9200/")
 
 
 def fetch_secrets():
@@ -61,6 +62,18 @@ def cache_response(method, url, data, params, response):
     }
     try:
         es.index(index="cache", body=body)
+    except Exception as err:
+        logger.error(err)
+
+    return
+
+
+def log_request(**kwargs):
+    logger.info("Logging request")
+    body = kwargs
+    body["timestamp"] = str(datetime.now())
+    try:
+        es.index(index="request_logs", body=body)
     except Exception as err:
         logger.error(err)
 

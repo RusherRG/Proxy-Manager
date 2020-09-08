@@ -4,7 +4,8 @@ from random_user_agent.params import SoftwareName, OperatingSystem
 
 from utils import get_logger
 from .rate_limit_utils import get_secret, update_count
-from .elasticsearch_utils import get_cached_response, cache_response
+from .elasticsearch_utils import get_cached_response, cache_response, \
+    log_request
 
 logger = get_logger(__name__)
 
@@ -51,7 +52,7 @@ class Request:
         self.secret = get_secret(self.source_type, self.endpoint)
         return self.secret
 
-    def send(self, method, url, **kwargs):
+    def send(self, method, url, proxies=None, **kwargs):
         request = requests.Request(method, url, **kwargs)
         if self.cache:
             response = self.check_cache(method=method, url=url,
@@ -61,10 +62,13 @@ class Request:
                 return response
         logger.debug("Sending request: {}".format(request))
         self.count += 1
-        response = self.session.send(request.prepare())
-        cache_response(method=method, url=url,
-                       data=request.data, params=request.params,
-                       response=response)
+        response = self.session.send(request.prepare(), proxies=proxies)
+        if self.cache:
+            cache_response(method=method, url=url,
+                           data=request.data, params=request.params,
+                           response=response)
+        log_request(method=method, url=url, endpoint=self.endpoint,
+                    secret_type=self.source_type, secret=self.secret)
         return response
 
     def run(self):

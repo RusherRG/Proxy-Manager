@@ -23,6 +23,7 @@ class Request:
 
     def create_session(self):
         """
+        Initializes the variables and creates a requests Session
         """
         software_names = [SoftwareName.CHROME.value]
         operating_systems = [OperatingSystem.WINDOWS.value,
@@ -35,6 +36,9 @@ class Request:
         return
 
     def close_session(self):
+        """
+        Closes the session and updates the count for the current secret
+        """
         logger.info("Closing session")
         if self.secret is not None and self.count > 0:
             update_count(self.source_type, self.endpoint,
@@ -53,6 +57,10 @@ class Request:
         return self.secret
 
     def send(self, method, url, proxies=None, **kwargs):
+        """
+        Sends the request as per the provided config. Checks the cache if
+        self.cache==True. Logs the requests and caches the response
+        """
         request = requests.Request(method, url, **kwargs)
         if self.cache:
             response = self.check_cache(method=method, url=url,

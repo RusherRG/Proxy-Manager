@@ -7,6 +7,9 @@ es = Elasticsearch(hosts="http://elastic:1234567Ee@localhost:9200/")
 
 
 def fetch_secrets():
+    """
+    Fetch the secrets json from Elasticsearch
+    """
     logger.info("Fetching secrets")
     secrets_json = es.get(index="secrets", id=1)
     if not secrets_json.get("found", False):
@@ -16,12 +19,19 @@ def fetch_secrets():
 
 
 def post_secrets(secrets_json):
+    """
+    Posts the new secrets json from Elasticsearch
+    """
     logger.info("Posting secrets to ElasticSearch")
     es.index(index="secrets", body=secrets_json, id=1)
     return
 
 
 def get_cached_response(request_query):
+    """
+    Given the request_query, cache index in Elasticsearch is searched to find
+    a match and the cached response is returned
+    """
     logger.info("Checking cache")
     for d in ["data", "params"]:
         if d in request_query:
@@ -52,9 +62,11 @@ def get_cached_response(request_query):
 
 
 def cache_response(method, url, data, params, response):
+    """
+    Caches the response in cache index
+    """
     logger.info("Caching response")
     response_json = response.__dict__
-    print(response_json)
     res = {}
     for key in ["content", "text", "json", "html"]:
         if key in response_json:
@@ -75,6 +87,9 @@ def cache_response(method, url, data, params, response):
 
 
 def log_request(**kwargs):
+    """
+    Logs the request so that it could be used by Kibana to plot dashboard
+    """
     logger.info("Logging request")
     body = kwargs
     body["timestamp"] = str(datetime.now())

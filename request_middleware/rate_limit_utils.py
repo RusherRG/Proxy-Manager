@@ -11,6 +11,9 @@ logger = get_logger(__name__)
 
 
 def update_secrets(file_path="configs/secrets.json"):
+    """
+    Updates the secrets document in Elasticsearch using the given file_path
+    """
     if not os.path.isfile(file_path):
         logger.error("File not found: '{}'".format(file_path))
         return
@@ -44,6 +47,9 @@ def update_secrets(file_path="configs/secrets.json"):
 
 
 def get_secret(secret_type, endpoint):
+    """
+    Fetches the secret with the least usage count from elasticsearch
+    """
     secrets_json = fetch_secrets()
     secrets = secrets_json.get(
         secret_type+"_based", {}).get(endpoint, {}).get(secret_type+"s", {})
@@ -76,6 +82,9 @@ def get_proxy(endpoint):
 
 
 def update_count(secret_type, endpoint, secret, count):
+    """
+    Updates the usage count of a particular secret
+    """
     logger.info("Updating count {} by {}".format(endpoint, count))
     secrets_json = fetch_secrets()
     secrets_json[secret_type+"_based"][endpoint][secret_type+"s"][secret] += \
@@ -85,6 +94,11 @@ def update_count(secret_type, endpoint, secret, count):
 
 
 def reset_limits():
+    """
+    Fetch the secrets json. For each secret present in the json if the time
+    elapsed since last_update is greater than it's refresh time, the count is
+    updated
+    """
     secrets_json = fetch_secrets
     last_update = secrets_json.get("last_update", time.time())
     time_difference = (time.time() - last_update) // 60

@@ -54,6 +54,7 @@ def get_cached_response(request_query):
 def cache_response(method, url, data, params, response):
     logger.info("Caching response")
     response_json = response.__dict__
+    print(response_json)
     res = {}
     for key in ["content", "text", "json", "html"]:
         if key in response_json:

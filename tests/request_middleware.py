@@ -55,9 +55,9 @@ class RequestMiddlewareTest(unittest.TestCase):
         key = req.get_key_proxy()
         headers = {"key": key}
         response = req.send("GET", URL.format("api"),
-                            headers=headers, data={"dummy": "data"}).json()
+                            headers=headers, data={"dummy": "data"})
         new_response = req.send("GET", URL.format("api"),
                                 headers=headers,
-                                data={"dummy": "new_data"}).json()
+                                data={"dummy": "new_data"})
         self.assertEquals(response.get("data"), new_response.get('data'))
         req.close_session()

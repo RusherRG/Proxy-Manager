@@ -23,6 +23,11 @@ def post_secrets(secrets_json):
 
 def get_cached_response(request_query):
     logger.info("Checking cache")
+    for d in ["data", "params"]:
+        if d in request_query:
+            for key, value in request_query[d].items():
+                request_query[d+"."+key] = value
+            del request_query[d]
     body = {
         "query": {
             "bool": {

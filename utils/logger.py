@@ -1,5 +1,6 @@
 import logging
 import colorlog
+import logstash
 
 LOG_LEVEL = logging.INFO
 
@@ -19,7 +20,7 @@ def get_logger(name):
     logger = logging.getLogger(name)
     logger.setLevel(LOG_LEVEL)
 
-    # logger.addHandler(logstash.TCPLogstashHandler(
-    #     'localhost', 6000, version=1))
+    logger.addHandler(logstash.TCPLogstashHandler(
+        'localhost', 7000, version=1))
 
     return logger

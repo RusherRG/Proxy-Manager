@@ -15,13 +15,6 @@ A python requests-middleware that logs and caches the requests sent through it, 
 * Manages the API key rate limits and IP limits by rotating the keys or IPs depending upon their usage counts
 * Send batch requests asynchronously (yet to be added)
 
-## Server
-
-* A flask application with an endpoint to handle the incoming requests
-* Forward all the requests and fetch appropriate responses
-* Scalable as there can be huge number of requests at the same time based on CPU utilization
-* Load balances across the various nodes
-
 ## Monitor
 
 * Elastic Stack comprising of Elastic Search, Logstash and Kibana is used
@@ -37,22 +30,6 @@ A python requests-middleware that logs and caches the requests sent through it, 
 cd Monitor/
 docker-compose up
 ```
-
-### Setting up Flask-Server
-```
-cd Server/
-docker build . -t flask-proxy-server
-```
-
-### Running the kubernetes nodes and autoscaling
-```
-sudo minikube start --vm-driver=none
-kubectl apply -f Server/deployment.yaml
-kubectl autoscale deployment flask-proxy-server --cpu-percent=50 --min=1 --max=10
-```
-
-`python3 proxy.py` A script for simulate high load on the server 
-
 
 ### Using the requests_middleware
 ```py
@@ -82,6 +59,28 @@ req.close_session()
 ```
 python3 test.py
 ```
+
+## Server
+
+* A flask application with an endpoint to handle the incoming requests
+* Forward all the requests and fetch appropriate responses
+* Scalable as there can be huge number of requests at the same time based on CPU utilization
+* Load balances across the various nodes
+
+### Setting up Flask-Server
+```
+cd Server/
+docker build . -t flask-proxy-server
+```
+
+### Running the kubernetes nodes and autoscaling
+```
+sudo minikube start --vm-driver=none
+kubectl apply -f Server/deployment.yaml
+kubectl autoscale deployment flask-proxy-server --cpu-percent=50 --min=1 --max=10
+```
+
+`python3 proxy.py` A script for simulate high load on the server 
 
 ## Dashboard
 

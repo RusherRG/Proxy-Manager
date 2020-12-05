@@ -1,9 +1,15 @@
+import os
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from utils import get_logger
+from dotenv import load_dotenv
+from pathlib import Path
+
+env_path = '../.env'
+load_dotenv(dotenv_path=env_path)
 
 logger = get_logger(__name__)
-es = Elasticsearch(hosts="http://elastic:1234567Ee@localhost:9200/")
+es = Elasticsearch(hosts=os.getenv("ELASTICSEARCH_URI"))
 
 
 def fetch_secrets():

@@ -11,5 +11,5 @@ MarkupSafe==1.1.1
 python3-logstash==0.4.80
 random-user-agent==1.0.1
 requests==2.23.0
-urllib3==1.25.8
+urllib3==1.26.5
 Werkzeug==1.0.0
